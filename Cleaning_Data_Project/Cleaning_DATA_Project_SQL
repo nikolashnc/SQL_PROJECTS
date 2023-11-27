@@ -1,0 +1,119 @@
+
+------------CLEANING DATA---------------
+
+Select *
+From Nashville
+order by uniqueid
+-----------------------------
+
+-----------Standandize Date Format
+Select SaleDATEconverted, Convert(Date,SaleDate)
+From Nashville
+
+Update Nashville
+Set SaleDate= Convert(Date,SaleDate)
+
+Alter table Nashville
+Add SaleDateConverted date
+
+Update Nashville
+Set SaleDateConverted=Convert(Date,SaleDate)
+
+----------------------Populate Property Adress Data
+
+Select a.ParcelID, a.PropertyAddress, b.ParcelID, b.PropertyAddress, NULLIF(b.PropertyAddress,a.PropertyAddress)
+from Nashville a
+join Nashville b
+on a.ParcelID = b. ParcelID AND
+a.UniqueID<>b.UniqueID
+where a.propertyaddress is null
+
+Update a
+Set PropertyAddress =  NULLIF(b.PropertyAddress,a.PropertyAddress)
+from Nashville a
+join Nashville b
+on a.ParcelID = b. ParcelID AND
+a.UniqueID<>b.UniqueID
+where a.propertyaddress is null
+
+----------------Breaking out Address into Individual columns (Adress,City,State)
+
+Select PropertyAddress, charindex(',',propertyaddress) as 'comma position',len(propertyaddress) as lenght,
+left(propertyaddress,charindex(',',propertyaddress)-1) as Address,
+substring(propertyaddress, charindex(',',propertyaddress) + 1, len(propertyaddress) - (charindex(',',propertyaddress) ))
+from Nashville
+
+Alter table Nashville
+Add PropertySplitAddress nvarchar(255)
+
+Update Nashville
+Set PropertySplitAddress = left(propertyaddress,charindex(',',propertyaddress)-1)
+
+Alter table Nashville
+Add PropertySplitCity nvarchar(255)
+
+Update Nashville
+Set PropertySplitCity = substring(propertyaddress, charindex(',',propertyaddress) + 1, len(propertyaddress) - (charindex(',',propertyaddress) ))
+
+--------------Owner Address
+
+Select 
+Parsename(Replace(owneraddress,',','.'),3) as OwnerSplitAdress,
+Parsename(Replace(owneraddress,',','.'),2) as OwnerSplitCity,
+Parsename(Replace(owneraddress,',','.'),1) as OwnerSplitState
+from nashville
+
+
+Alter table Nashville
+Add OwnerSplitAdress nvarchar(255)
+
+Update Nashville
+Set OwnerSplitAdress = Parsename(Replace(owneraddress,',','.'),3)
+
+
+Alter table Nashville
+Add OwnerSplitCity nvarchar(255)
+
+Update Nashville
+Set OwnerSplitCity = Parsename(Replace(owneraddress,',','.'),2)
+
+
+Alter table Nashville
+Add OwnerSplitState nvarchar(255)
+
+--------------Change Y and N to Yes and No in "SoldasVacant"
+
+Update Nashville
+Set SoldasVacant= CASE
+WHEN SoldasVacant ='Yes' THEN
+'Yes' 
+WHEN SoldasVacant ='No' THEN
+'No' 
+WHEN SoldasVacant ='Y' THEN
+'Yes' 
+WHEN SoldasVacant ='N' THEN
+'No' 
+end 
+
+--------------------Remove Duplicates
+
+wITH DUPLICATES AS (
+Select uniqueid, Row_number() over(partition by parcelid,propertyaddress,saleprice,saledate,legalreference order by uniqueid) AS D
+from Nashville
+ )
+
+Select uniqueid
+from duplicates
+where d =2
+order by propertyaddress
+
+Delete from duplicates
+where d=2
+
+------------Delete Unused Columns
+
+Select*
+from nashville
+
+Alter table Nashville
+Drop column OwnerAddress, TaxDistrict, PropertyAddress,SaleDate
