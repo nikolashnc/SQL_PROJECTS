@@ -1,0 +1,8 @@
+This video delves into a sales dataset, unveiling diverse analytics and insights derived from customers' historical purchase patterns. We progress from scrutinizing sales revenue to crafting a customer segmentation analysis employing the RFM technique. Our journey spans from fundamental SQL queries to tackling intricate challenges through techniques like SUB QUERY, CTEs, AGGREGATE, and WINDOW functions. Throughout, we focus on honing the following skill set:
+
+Uploading files into SQL Server Database
+Utilizing SQL Aggregate and Window Functions
+Implementing SQL Sub Queries
+Harnessing Common Table Expressions (CTEs)
+Leveraging SQL's XML Path Function
+Harnessing the power of Tableau
