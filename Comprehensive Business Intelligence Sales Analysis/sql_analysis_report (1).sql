@@ -114,9 +114,6 @@ SELECT
     CONCAT(ROUND((CAST(Sales AS FLOAT) / SUM(Sales) OVER ()) * 100, 2), '%') AS Percentage_of_Total
 FROM CTE;
 
--- (Continued in the file)
-
-
 -- ===============================
 -- 5. PRODUCT COST SEGMENTATION
 -- ===============================
